@@ -2,6 +2,7 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import StatsBar from '@/components/StatsBar';
+import YouTubeHub from '@/components/YouTubeHub';
 import FeaturedVideos from '@/components/FeaturedVideos';
 import ContentPillars from '@/components/ContentPillars';
 import Destinations from '@/components/Destinations';
@@ -18,6 +19,7 @@ function App() {
         <main>
           <Hero />
           <StatsBar />
+          <YouTubeHub />
           <FeaturedVideos />
           <ContentPillars />
           <Destinations />
