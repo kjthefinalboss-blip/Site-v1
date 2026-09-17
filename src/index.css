@@ -145,6 +145,43 @@
   .card-hover {
     @apply transition-all duration-500 ease-out-expo hover:-translate-y-2 hover:shadow-2xl hover:shadow-brand-900/10;
   }
+
+  .featured-video-card {
+    background: linear-gradient(145deg, rgba(255,255,255,0.14), rgba(255,255,255,0.045));
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 18px 50px rgba(5,5,5,0.12), inset 0 1px 0 rgba(255,255,255,0.18);
+    backdrop-filter: blur(18px) saturate(135%);
+    -webkit-backdrop-filter: blur(18px) saturate(135%);
+  }
+
+  .featured-video-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 0%), rgba(255,255,255,0.18), transparent 34%);
+    transition: opacity 500ms ease;
+    z-index: 1;
+  }
+
+  .featured-video-card:hover::before {
+    opacity: 1;
+  }
+
+  .featured-video-card > div:first-child,
+  .featured-video-card > div:last-child {
+    position: relative;
+    z-index: 2;
+  }
+
+  @media (prefers-color-scheme: light) {
+    .featured-video-card {
+      background: linear-gradient(145deg, rgba(255,255,255,0.8), rgba(255,255,255,0.48));
+      border-color: rgba(255,255,255,0.75);
+      box-shadow: 0 18px 50px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+  }
 }
 
 @layer utilities {

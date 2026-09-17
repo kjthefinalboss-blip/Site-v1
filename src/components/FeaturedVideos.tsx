@@ -11,7 +11,7 @@ function VideoCard({ video, index }: { video: typeof featuredVideos[number]; ind
       href={video.url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`reveal group relative overflow-hidden rounded-2xl glass-card card-hover ${
+      className={`reveal featured-video-card group relative overflow-hidden rounded-2xl card-hover ${
         isVisible ? 'is-visible' : ''
       }`}
       style={{ ['--reveal-delay' as string]: `${(index % 3) * 120}ms`, ['--glow-color' as string]: 'rgba(16,185,129,0.3)' }}
@@ -68,8 +68,9 @@ export default function FeaturedVideos() {
   const { ref: headerRef, isVisible: headerVisible } = useReveal<HTMLDivElement>();
 
   return (
-    <section id="videos" className="section-padding py-24 md:py-32">
-      <div className="max-w-7xl mx-auto">
+    <section id="videos" className="section-padding py-24 md:py-32 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-500/[0.02] to-gold-500/[0.03] pointer-events-none" />
+      <div className="relative z-10 max-w-7xl mx-auto">
         {/* Header */}
         <div
           ref={headerRef}
