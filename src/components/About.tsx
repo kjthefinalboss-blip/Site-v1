@@ -28,7 +28,7 @@ export default function About() {
             </div>
 
             {/* Floating card */}
-            <div className="absolute -bottom-6 -right-4 md:-right-8 glass rounded-2xl p-5 shadow-xl max-w-[200px]">
+            <div className="absolute -bottom-6 -right-4 md:-right-8 glass rounded-2xl p-5 shadow-xl max-w-[200px] animate-float">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center">
                   <Globe className="w-5 h-5 text-white" />
@@ -41,7 +41,7 @@ export default function About() {
             </div>
 
             {/* Floating badge top */}
-            <div className="absolute -top-4 -left-4 glass rounded-2xl px-4 py-3 shadow-xl">
+            <div className="absolute -top-4 -left-4 glass rounded-2xl px-4 py-3 shadow-xl animate-float" style={{ animationDelay: '2s' }}>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
                 <span className="text-xs font-medium text-ink-700 dark:text-ink-200">Based in Saudi Arabia</span>

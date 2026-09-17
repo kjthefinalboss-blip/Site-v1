@@ -63,7 +63,8 @@ export default function RoadTrips() {
         <img
           src="https://images.pexels.com/photos/35097388/pexels-photo-35097388.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1280"
           alt="Desert highway"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover animate-spin-slow"
+          style={{ transformOrigin: 'center', transform: 'scale(1.15)' }}
         />
         <div className="absolute inset-0 bg-ink-950/85" />
         <div className="absolute inset-0 bg-gradient-to-b from-ink-950 via-ink-950/80 to-ink-950" />

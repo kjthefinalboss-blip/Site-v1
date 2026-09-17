@@ -11,7 +11,7 @@ function PillarCard({ pillar, index }: { pillar: typeof contentPillars[number]; 
   return (
     <div
       ref={ref}
-      className={`reveal group relative overflow-hidden rounded-2xl h-80 md:h-96 card-hover ${
+      className={`reveal group relative overflow-hidden rounded-2xl h-80 md:h-96 card-hover animate-tilt ${
         isVisible ? 'is-visible' : ''
       }`}
       style={{ ['--reveal-delay' as string]: `${index * 120}ms` }}

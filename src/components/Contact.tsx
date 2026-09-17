@@ -34,8 +34,9 @@ export default function Contact() {
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-brand-600 via-brand-700 to-ink-950" />
       <div className="absolute inset-0 bg-grid opacity-20" />
-      <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-gold-500/20 blur-3xl animate-pulse-slow" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-brand-400/20 blur-3xl animate-pulse-slow" />
+      <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-gold-500/20 blur-3xl animate-drift" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-brand-400/20 blur-3xl animate-drift-reverse" />
+      <div className="absolute top-1/3 right-1/3 w-72 h-72 rounded-full bg-gold-300/15 blur-3xl animate-float" />
 
       <div className="relative max-w-4xl mx-auto">
         <div

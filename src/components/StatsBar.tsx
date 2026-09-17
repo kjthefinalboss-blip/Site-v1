@@ -19,10 +19,11 @@ function StatItem({ stat, index }: { stat: typeof stats[number]; index: number }
       style={{ ['--reveal-delay' as string]: `${index * 120}ms` }}
     >
       <div className="relative mb-4">
-        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500/15 to-gold-500/15 flex items-center justify-center">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500/15 to-gold-500/15 flex items-center justify-center transition-transform duration-500 hover:scale-110">
           <Icon className="w-6 h-6 text-brand-600 dark:text-brand-400" />
         </div>
         <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-gold-500 animate-pulse" />
+        <div className="absolute inset-0 rounded-2xl bg-brand-500/20 blur-md opacity-0 hover:opacity-100 transition-opacity duration-500 -z-10" />
       </div>
       <div className="text-3xl md:text-4xl lg:text-5xl font-bold font-display text-ink-900 dark:text-white">
         {count}
@@ -38,7 +39,9 @@ function StatItem({ stat, index }: { stat: typeof stats[number]; index: number }
 export default function StatsBar() {
   return (
     <section className="relative -mt-20 z-20 section-padding">
-      <div className="glass rounded-3xl shadow-2xl shadow-ink-900/10 overflow-hidden">
+      <div className="glass rounded-3xl shadow-2xl shadow-ink-900/10 overflow-hidden relative">
+        {/* Top gradient accent */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-500 via-gold-500 to-brand-500 animate-gradient" />
         <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-ink-100 dark:divide-ink-800">
           {stats.map((stat, i) => (
             <StatItem key={stat.label} stat={stat} index={i} />

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { PlayCircle, ArrowRight, Calendar, ChevronDown } from 'lucide-react';
+import { PlayCircle, ArrowRight, Calendar, ChevronDown, Compass, MapPin, Plane } from 'lucide-react';
 import { channelInfo } from '@/lib/content';
 
 export default function Hero() {
@@ -38,6 +38,17 @@ export default function Hero() {
       {/* Floating decorative orbs */}
       <div className="absolute top-1/4 left-10 w-72 h-72 rounded-full bg-brand-500/20 blur-3xl animate-pulse-slow" />
       <div className="absolute bottom-1/4 right-10 w-96 h-96 rounded-full bg-gold-500/15 blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }} />
+
+      {/* Floating travel icons */}
+      <div className="absolute top-[20%] right-[15%] text-white/10 animate-float-rotate hidden md:block" style={{ animationDelay: '0s' }}>
+        <Compass className="w-16 h-16" />
+      </div>
+      <div className="absolute bottom-[30%] left-[12%] text-white/10 animate-float-rotate hidden md:block" style={{ animationDelay: '3s' }}>
+        <MapPin className="w-12 h-12" />
+      </div>
+      <div className="absolute top-[35%] left-[8%] text-white/10 animate-float hidden md:block" style={{ animationDelay: '1.5s' }}>
+        <Plane className="w-14 h-14" />
+      </div>
 
       {/* Content */}
       <div

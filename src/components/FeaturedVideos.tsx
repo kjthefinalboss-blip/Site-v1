@@ -14,7 +14,7 @@ function VideoCard({ video, index }: { video: typeof featuredVideos[number]; ind
       className={`reveal group relative overflow-hidden rounded-2xl glass-card card-hover ${
         isVisible ? 'is-visible' : ''
       }`}
-      style={{ ['--reveal-delay' as string]: `${(index % 3) * 120}ms` }}
+      style={{ ['--reveal-delay' as string]: `${(index % 3) * 120}ms`, ['--glow-color' as string]: 'rgba(16,185,129,0.3)' }}
     >
       {/* Thumbnail */}
       <div className="relative aspect-video overflow-hidden">
