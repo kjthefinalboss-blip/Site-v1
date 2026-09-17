@@ -1,7 +1,7 @@
 import { useState, FormEvent } from 'react';
 import { useReveal } from '@/hooks/useScrollAnimations';
 import { channelInfo } from '@/lib/content';
-import { Mail, Send, Youtube, Instagram, Bell, CheckCircle } from 'lucide-react';
+import { Mail, Send, Youtube, Instagram, Briefcase, Handshake, CheckCircle } from 'lucide-react';
 
 export default function Contact() {
   const { ref, isVisible } = useReveal<HTMLDivElement>();
@@ -83,21 +83,38 @@ export default function Contact() {
             )}
           </form>
 
-          {/* Business contact */}
-          <div className="mt-12 p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Bell className="w-4 h-4 text-gold-400" />
-              <span className="text-sm font-semibold text-white tracking-wide">Business & Collaborations</span>
-            </div>
+          {/* Contact emails */}
+          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
             <a
-              href={`mailto:${channelInfo.contactEmail}`}
-              className="text-lg font-display font-semibold text-gold-400 hover:text-gold-300 transition-colors duration-300"
+              href={`mailto:${channelInfo.businessEmail}`}
+              className="group p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 hover:border-gold-400/50 transition-all duration-300"
             >
-              {channelInfo.contactEmail}
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-10 h-10 rounded-xl bg-gold-500/20 flex items-center justify-center">
+                  <Briefcase className="w-5 h-5 text-gold-400" />
+                </div>
+                <span className="text-sm font-semibold text-white tracking-wide">Business Enquiries</span>
+              </div>
+              <p className="text-sm text-ink-200 mb-2">For sponsorships, brand deals, and business inquiries.</p>
+              <span className="text-sm font-display font-semibold text-gold-400 group-hover:text-gold-300 transition-colors duration-300 break-all">
+                {channelInfo.businessEmail}
+              </span>
             </a>
-            <p className="mt-2 text-sm text-ink-200">
-              For sponsorships, collaborations, and business inquiries, reach out via email.
-            </p>
+            <a
+              href={`mailto:${channelInfo.collaborationEmail}`}
+              className="group p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 hover:border-brand-400/50 transition-all duration-300"
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-10 h-10 rounded-xl bg-brand-500/20 flex items-center justify-center">
+                  <Handshake className="w-5 h-5 text-brand-400" />
+                </div>
+                <span className="text-sm font-semibold text-white tracking-wide">Collaborations</span>
+              </div>
+              <p className="text-sm text-ink-200 mb-2">For partnerships, collaborations, and creative projects.</p>
+              <span className="text-sm font-display font-semibold text-brand-400 group-hover:text-brand-300 transition-colors duration-300 break-all">
+                {channelInfo.collaborationEmail}
+              </span>
+            </a>
           </div>
 
           {/* Social links */}
@@ -121,7 +138,7 @@ export default function Contact() {
               <Instagram className="w-5 h-5" />
             </a>
             <a
-              href={`mailto:${channelInfo.contactEmail}`}
+              href={`mailto:${channelInfo.businessEmail}`}
               className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white/20 hover:scale-110 transition-all duration-300"
               aria-label="Email"
             >

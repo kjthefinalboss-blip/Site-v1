@@ -10,7 +10,8 @@ export const channelInfo = {
   uploadSchedule: 'New videos every Sunday & Thursday',
   language: 'Malayalam',
   baseLocation: 'Saudi Arabia',
-  contactEmail: 'rrandheshsreddaran@gmail.com',
+  businessEmail: 'rajimolrrandhesh@gmail.com',
+  collaborationEmail: 'rrandheshsreddaran@gmail.com',
   youtubeUrl: 'https://www.youtube.com/@rajikrrtravelvlogs',
   instagramUrl: 'https://www.instagram.com/rajikrrtravelvlogs',
 };

@@ -112,9 +112,9 @@ export default function About() {
                 <Instagram className="w-5 h-5" />
               </a>
               <a
-                href={`mailto:${channelInfo.contactEmail}`}
+                href={`mailto:${channelInfo.businessEmail}`}
                 className="w-11 h-11 rounded-xl glass-card flex items-center justify-center text-ink-700 dark:text-ink-200 hover:text-brand-600 dark:hover:text-brand-400 hover:scale-110 transition-all duration-300"
-                aria-label="Email"
+                aria-label="Business email"
               >
                 <Mail className="w-5 h-5" />
               </a>

@@ -97,18 +97,24 @@ export default function Footer() {
                   <Instagram className="w-5 h-5" />
                 </a>
                 <a
-                  href={`mailto:${channelInfo.contactEmail}`}
+                  href={`mailto:${channelInfo.businessEmail}`}
                   className="w-10 h-10 rounded-xl bg-ink-800 flex items-center justify-center text-ink-300 hover:bg-brand-600 hover:text-white transition-all duration-300"
-                  aria-label="Email"
+                  aria-label="Business email"
                 >
                   <Mail className="w-5 h-5" />
                 </a>
               </div>
               <a
-                href={`mailto:${channelInfo.contactEmail}`}
-                className="text-sm text-ink-400 hover:text-gold-400 transition-colors duration-300 break-all"
+                href={`mailto:${channelInfo.businessEmail}`}
+                className="text-sm text-ink-400 hover:text-gold-400 transition-colors duration-300 break-all block"
               >
-                {channelInfo.contactEmail}
+                {channelInfo.businessEmail}
+              </a>
+              <a
+                href={`mailto:${channelInfo.collaborationEmail}`}
+                className="text-sm text-ink-400 hover:text-brand-400 transition-colors duration-300 break-all block mt-1"
+              >
+                {channelInfo.collaborationEmail}
               </a>
             </div>
           </div>
