@@ -1,0 +1,2 @@
+[functions.latest-videos]
+verify_jwt = false
