@@ -204,6 +204,7 @@ export const roadTrips = [
 export const navLinks = [
   { label: 'Home', href: '#home' },
   { label: 'Videos', href: '#videos' },
+  { label: 'Instagram', href: '#instagram' },
   { label: 'Destinations', href: '#destinations' },
   { label: 'Road Trips', href: '#road-trips' },
   { label: 'About', href: '#about' },

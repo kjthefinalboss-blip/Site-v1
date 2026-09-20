@@ -3,6 +3,7 @@ import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import StatsBar from '@/components/StatsBar';
 import FeaturedVideos from '@/components/FeaturedVideos';
+import InstagramFeed from '@/components/InstagramFeed';
 import ContentPillars from '@/components/ContentPillars';
 import Destinations from '@/components/Destinations';
 import RoadTrips from '@/components/RoadTrips';
@@ -77,6 +78,7 @@ function App() {
           <StatsBar />
           <MarqueeStrip />
           <FeaturedVideos />
+          <InstagramFeed />
           <ContentPillars />
           <Destinations />
           <RoadTrips />
