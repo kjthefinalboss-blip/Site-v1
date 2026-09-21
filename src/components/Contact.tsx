@@ -1,150 +1,176 @@
-import { useState, FormEvent } from 'react';
+import { useEffect, useState } from 'react';
 import { useReveal } from '@/hooks/useScrollAnimations';
-import { channelInfo } from '@/lib/content';
-import { Mail, Send, Youtube, Instagram, Briefcase, Handshake, CheckCircle } from 'lucide-react';
+import { channelInfo, featuredVideos } from '@/lib/content';
+import { PlayCircle, Calendar, ArrowRight, ExternalLink, RefreshCw } from 'lucide-react';
 
-export default function Contact() {
-  const { ref, isVisible } = useReveal<HTMLDivElement>();
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState('');
+type Video = {
+  id: string;
+  title: string;
+  publishedAt: string;
+  thumbnail: string;
+  url: string;
+  category: string;
+};
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    setError('');
+type VideosResponse = {
+  videos?: Video[];
+  error?: string;
+};
 
-    if (!email.trim()) {
-      setError('Please enter your email address.');
-      return;
-    }
+function formatPublishedDate(value: string): string {
+  return new Intl.DateTimeFormat('en', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(new Date(value));
+}
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('Please enter a valid email address.');
-      return;
-    }
+const fallbackVideos: Video[] = featuredVideos.slice(0, 6).map((video, index) => ({
+  id: `fallback-${index}`,
+  title: video.title,
+  publishedAt: new Date(Date.now() - index * 1000 * 60 * 60 * 24 * 5).toISOString(),
+  thumbnail: video.thumbnail,
+  url: video.url,
+  category: video.category,
+}));
 
-    setSubmitted(true);
-    setEmail('');
-    setTimeout(() => setSubmitted(false), 5000);
-  };
+function VideoCard({ video, index }: { video: Video; index: number }) {
+  const { ref, isVisible } = useReveal<HTMLAnchorElement>();
 
   return (
-    <section id="contact" className="section-padding py-24 md:py-32 relative overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-brand-600 via-brand-700 to-ink-950" />
-      <div className="absolute inset-0 bg-grid opacity-20" />
-      <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full bg-gold-500/20 blur-3xl animate-drift" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full bg-brand-400/20 blur-3xl animate-drift-reverse" />
-      <div className="absolute top-1/3 right-1/3 w-72 h-72 rounded-full bg-gold-300/15 blur-3xl animate-float" />
-
-      <div className="relative max-w-4xl mx-auto">
-        <div
-          ref={ref}
-          className={`reveal text-center ${isVisible ? 'is-visible' : ''}`}
-        >
-          <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white text-xs font-semibold tracking-widest uppercase mb-4">
-            Stay Connected
+    <a
+      ref={ref}
+      href={video.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`reveal featured-video-card group relative overflow-hidden rounded-2xl card-hover ${
+        isVisible ? 'is-visible' : ''
+      }`}
+      style={{ ['--reveal-delay' as string]: `${(index % 3) * 120}ms`, ['--glow-color' as string]: 'rgba(16,185,129,0.3)' }}
+    >
+      <div className="relative aspect-video overflow-hidden">
+        <img
+          src={video.thumbnail}
+          alt={video.title}
+          loading="lazy"
+          className="w-full h-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-110"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-ink-950/10 to-transparent" />
+        <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-brand-600/90 backdrop-blur-sm text-white text-xs font-semibold tracking-wide">
+          {video.category}
+        </div>
+        <div className="absolute bottom-3 right-3 flex items-center gap-1 px-2.5 py-1 rounded-md bg-ink-950/80 backdrop-blur-sm text-white text-xs font-medium">
+          <Calendar className="w-3 h-3" />
+          {formatPublishedDate(video.publishedAt)}
+        </div>
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+          <div className="w-16 h-16 rounded-full bg-brand-600/90 backdrop-blur-sm flex items-center justify-center shadow-2xl scale-50 group-hover:scale-100 transition-transform duration-500 ease-out-expo">
+            <PlayCircle className="w-8 h-8 text-white" />
+          </div>
+        </div>
+      </div>
+      <div className="p-5">
+        <h3 className="font-display font-semibold text-base text-ink-900 dark:text-white leading-snug line-clamp-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors duration-300">
+          {video.title}
+        </h3>
+        <div className="mt-3 flex items-center justify-end">
+          <span className="flex items-center gap-1 text-xs font-medium text-brand-600 dark:text-brand-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            Watch <ArrowRight className="w-3 h-3" />
           </span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-display text-white text-balance">
-            Never Miss a New Adventure
+        </div>
+      </div>
+    </a>
+  );
+}
+
+export default function FeaturedVideos() {
+  const { ref: headerRef, isVisible: headerVisible } = useReveal<HTMLDivElement>();
+  const [videos, setVideos] = useState<Video[]>(fallbackVideos);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const loadVideos = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/latest-videos`, {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+        });
+        const result = (await response.json()) as VideosResponse;
+        if (!response.ok || !Array.isArray(result.videos) || result.videos.length === 0) {
+          throw new Error(result.error || 'No videos are available right now.');
+        }
+        setVideos(result.videos.slice(0, 6));
+        setError('');
+      } catch (loadError) {
+        setVideos(fallbackVideos);
+        setError('');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void loadVideos();
+  }, []);
+
+  return (
+    <section id="videos" className="section-padding py-24 md:py-32 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-500/[0.02] to-gold-500/[0.03] pointer-events-none" />
+      <div className="relative z-10 max-w-7xl mx-auto">
+        <div
+          ref={headerRef}
+          className={`reveal text-center mb-14 ${headerVisible ? 'is-visible' : ''}`}
+        >
+          <span className="inline-block px-4 py-1.5 rounded-full bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 text-xs font-semibold tracking-widest uppercase mb-4">
+            Featured Content
+          </span>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-display text-ink-900 dark:text-white text-balance">
+            Latest <span className="text-gradient">Travel Videos</span>
           </h2>
-          <p className="mt-4 text-base text-ink-200 max-w-2xl mx-auto">
-            Subscribe to our newsletter for travel tips, behind-the-scenes content, and updates on new videos every Sunday and Thursday.
+          <p className="mt-4 text-base text-ink-500 dark:text-ink-400 max-w-2xl mx-auto">
+            The six newest adventures from {channelInfo.name}, updated automatically as new videos are published.
           </p>
+        </div>
 
-          {/* Newsletter form */}
-          <form onSubmit={handleSubmit} className="mt-8 max-w-md mx-auto">
-            <div className="flex flex-col sm:flex-row gap-3">
-              <div className="relative flex-1">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ink-400" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className="w-full pl-12 pr-4 py-3.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-ink-300 text-sm focus:outline-none focus:border-gold-400 focus:bg-white/15 transition-all duration-300"
-                />
-              </div>
-              <button
-                type="submit"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-full bg-gold-500 text-ink-900 font-semibold text-sm transition-all duration-300 hover:bg-gold-400 hover:shadow-lg hover:shadow-gold-500/30 hover:-translate-y-0.5"
-              >
-                <Send className="w-4 h-4" />
-                Subscribe
-              </button>
-            </div>
-            {error && <p className="mt-3 text-sm text-gold-300">{error}</p>}
-            {submitted && (
-              <div className="mt-4 flex items-center justify-center gap-2 text-sm text-white animate-fade-in-up">
-                <CheckCircle className="w-5 h-5 text-gold-400" />
-                You are subscribed! Watch your inbox for travel updates.
-              </div>
-            )}
-          </form>
-
-          {/* Contact emails */}
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 gap-4 text-left">
-            <a
-              href={`mailto:${channelInfo.businessEmail}`}
-              className="group p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 hover:border-gold-400/50 transition-all duration-300"
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-gold-500/20 flex items-center justify-center">
-                  <Briefcase className="w-5 h-5 text-gold-400" />
+        {isLoading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8" aria-label="Loading latest videos">
+            {Array.from({ length: 6 }, (_, index) => (
+              <div key={index} className="overflow-hidden rounded-2xl bg-white/60 dark:bg-ink-900/60 animate-pulse">
+                <div className="aspect-video bg-ink-200 dark:bg-ink-800" />
+                <div className="p-5 space-y-3">
+                  <div className="h-4 rounded bg-ink-200 dark:bg-ink-800" />
+                  <div className="h-4 w-2/3 rounded bg-ink-200 dark:bg-ink-800" />
                 </div>
-                <span className="text-sm font-semibold text-white tracking-wide">Business Enquiries</span>
               </div>
-              <p className="text-sm text-ink-200 mb-2">For sponsorships, brand deals, and business inquiries.</p>
-              <span className="text-sm font-display font-semibold text-gold-400 group-hover:text-gold-300 transition-colors duration-300 break-all">
-                {channelInfo.businessEmail}
-              </span>
-            </a>
-            <a
-              href={`mailto:${channelInfo.collaborationEmail}`}
-              className="group p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 hover:border-brand-400/50 transition-all duration-300"
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-brand-500/20 flex items-center justify-center">
-                  <Handshake className="w-5 h-5 text-brand-400" />
-                </div>
-                <span className="text-sm font-semibold text-white tracking-wide">Collaborations</span>
-              </div>
-              <p className="text-sm text-ink-200 mb-2">For partnerships, collaborations, and creative projects.</p>
-              <span className="text-sm font-display font-semibold text-brand-400 group-hover:text-brand-300 transition-colors duration-300 break-all">
-                {channelInfo.collaborationEmail}
-              </span>
-            </a>
+            ))}
           </div>
+        )}
 
-          {/* Social links */}
-          <div className="mt-8 flex items-center justify-center gap-4">
-            <a
-              href={channelInfo.youtubeUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white/20 hover:scale-110 transition-all duration-300"
-              aria-label="YouTube"
-            >
-              <Youtube className="w-5 h-5" />
-            </a>
-            <a
-              href={channelInfo.instagramUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white/20 hover:scale-110 transition-all duration-300"
-              aria-label="Instagram"
-            >
-              <Instagram className="w-5 h-5" />
-            </a>
-            <a
-              href={`mailto:${channelInfo.businessEmail}`}
-              className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white hover:bg-white/20 hover:scale-110 transition-all duration-300"
-              aria-label="Email"
-            >
-              <Mail className="w-5 h-5" />
-            </a>
+        {!isLoading && error && (
+          <div className="max-w-xl mx-auto rounded-2xl border border-brand-200 dark:border-brand-800 bg-white/70 dark:bg-ink-900/70 p-8 text-center">
+            <p className="text-ink-700 dark:text-ink-200">{error}</p>
+            <button type="button" onClick={() => window.location.reload()} className="btn-outline mt-5">
+              <RefreshCw className="w-4 h-4" />
+              Try Again
+            </button>
           </div>
+        )}
+
+        {!isLoading && !error && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {videos.map((video, index) => (
+              <VideoCard key={video.id} video={video} index={index} />
+            ))}
+          </div>
+        )}
+
+        <div className="mt-12 text-center">
+          <a href={channelInfo.youtubeUrl} target="_blank" rel="noopener noreferrer" className="btn-outline group">
+            <ExternalLink className="w-4 h-4" />
+            View All Videos on YouTube
+          </a>
         </div>
       </div>
     </section>

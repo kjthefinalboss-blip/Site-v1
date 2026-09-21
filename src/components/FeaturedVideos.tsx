@@ -1,165 +1,130 @@
-import { useEffect, useState } from 'react';
 import { useReveal } from '@/hooks/useScrollAnimations';
 import { channelInfo } from '@/lib/content';
-import { PlayCircle, Calendar, ArrowRight, ExternalLink, RefreshCw } from 'lucide-react';
+import { Youtube, Instagram, Mail, Calendar, Globe, Heart, MapPin } from 'lucide-react';
 
-type Video = {
-  id: string;
-  title: string;
-  publishedAt: string;
-  thumbnail: string;
-  url: string;
-  category: string;
-};
-
-type VideosResponse = {
-  videos?: Video[];
-  error?: string;
-};
-
-function formatPublishedDate(value: string): string {
-  return new Intl.DateTimeFormat('en', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date(value));
-}
-
-function VideoCard({ video, index }: { video: Video; index: number }) {
-  const { ref, isVisible } = useReveal<HTMLAnchorElement>();
+export default function About() {
+  const { ref: imageRef, isVisible: imageVisible } = useReveal<HTMLDivElement>();
+  const { ref: textRef, isVisible: textVisible } = useReveal<HTMLDivElement>();
 
   return (
-    <a
-      ref={ref}
-      href={video.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={`reveal featured-video-card group relative overflow-hidden rounded-2xl card-hover ${
-        isVisible ? 'is-visible' : ''
-      }`}
-      style={{ ['--reveal-delay' as string]: `${(index % 3) * 120}ms`, ['--glow-color' as string]: 'rgba(16,185,129,0.3)' }}
-    >
-      <div className="relative aspect-video overflow-hidden">
-        <img
-          src={video.thumbnail}
-          alt={video.title}
-          loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-700 ease-out-expo group-hover:scale-110"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink-950/80 via-ink-950/10 to-transparent" />
-        <div className="absolute top-3 left-3 px-3 py-1 rounded-full bg-brand-600/90 backdrop-blur-sm text-white text-xs font-semibold tracking-wide">
-          {video.category}
-        </div>
-        <div className="absolute bottom-3 right-3 flex items-center gap-1 px-2.5 py-1 rounded-md bg-ink-950/80 backdrop-blur-sm text-white text-xs font-medium">
-          <Calendar className="w-3 h-3" />
-          {formatPublishedDate(video.publishedAt)}
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-          <div className="w-16 h-16 rounded-full bg-brand-600/90 backdrop-blur-sm flex items-center justify-center shadow-2xl scale-50 group-hover:scale-100 transition-transform duration-500 ease-out-expo">
-            <PlayCircle className="w-8 h-8 text-white" />
-          </div>
-        </div>
-      </div>
-      <div className="p-5">
-        <h3 className="font-display font-semibold text-base text-ink-900 dark:text-white leading-snug line-clamp-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors duration-300">
-          {video.title}
-        </h3>
-        <div className="mt-3 flex items-center justify-end">
-          <span className="flex items-center gap-1 text-xs font-medium text-brand-600 dark:text-brand-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            Watch <ArrowRight className="w-3 h-3" />
-          </span>
-        </div>
-      </div>
-    </a>
-  );
-}
+    <section id="about" className="section-padding py-24 md:py-32 bg-ink-50 dark:bg-ink-900/50 relative overflow-hidden">
+      <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-brand-500/10 blur-3xl" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full bg-gold-500/10 blur-3xl" />
 
-export default function FeaturedVideos() {
-  const { ref: headerRef, isVisible: headerVisible } = useReveal<HTMLDivElement>();
-  const [videos, setVideos] = useState<Video[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
+      <div className="relative max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div
+            ref={imageRef}
+            className={`reveal-left relative ${imageVisible ? 'is-visible' : ''}`}
+          >
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-ink-900/20">
+              <img
+                src="https://images.pexels.com/photos/35166960/pexels-photo-35166960.jpeg?auto=compress&cs=tinysrgb&w=1260&h=1500"
+                alt="Travel filmmaker capturing landscape"
+                className="w-full h-[500px] md:h-[600px] object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink-950/40 to-transparent" />
+            </div>
 
-  useEffect(() => {
-    const loadVideos = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/latest-videos`, {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
-          },
-        });
-        const result = (await response.json()) as VideosResponse;
-        if (!response.ok || !Array.isArray(result.videos) || result.videos.length === 0) {
-          throw new Error(result.error || 'No videos are available right now.');
-        }
-        setVideos(result.videos.slice(0, 6));
-      } catch (loadError) {
-        setError(loadError instanceof Error ? loadError.message : 'Unable to load the latest videos.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    void loadVideos();
-  }, []);
-
-  return (
-    <section id="videos" className="section-padding py-24 md:py-32 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-brand-500/[0.02] to-gold-500/[0.03] pointer-events-none" />
-      <div className="relative z-10 max-w-7xl mx-auto">
-        <div
-          ref={headerRef}
-          className={`reveal text-center mb-14 ${headerVisible ? 'is-visible' : ''}`}
-        >
-          <span className="inline-block px-4 py-1.5 rounded-full bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 text-xs font-semibold tracking-widest uppercase mb-4">
-            Featured Content
-          </span>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-display text-ink-900 dark:text-white text-balance">
-            Latest <span className="text-gradient">Travel Videos</span>
-          </h2>
-          <p className="mt-4 text-base text-ink-500 dark:text-ink-400 max-w-2xl mx-auto">
-            The six newest adventures from {channelInfo.name}, updated automatically as new videos are published.
-          </p>
-        </div>
-
-        {isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8" aria-label="Loading latest videos">
-            {Array.from({ length: 6 }, (_, index) => (
-              <div key={index} className="overflow-hidden rounded-2xl bg-white/60 dark:bg-ink-900/60 animate-pulse">
-                <div className="aspect-video bg-ink-200 dark:bg-ink-800" />
-                <div className="p-5 space-y-3">
-                  <div className="h-4 rounded bg-ink-200 dark:bg-ink-800" />
-                  <div className="h-4 w-2/3 rounded bg-ink-200 dark:bg-ink-800" />
+            <div className="absolute -bottom-6 -right-4 md:-right-8 glass rounded-2xl p-5 shadow-xl max-w-[200px] animate-float">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center">
+                  <Globe className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-lg font-bold font-display text-ink-900 dark:text-white">6+</div>
+                  <div className="text-xs text-ink-500 dark:text-ink-400">Countries</div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
 
-        {!isLoading && error && (
-          <div className="max-w-xl mx-auto rounded-2xl border border-brand-200 dark:border-brand-800 bg-white/70 dark:bg-ink-900/70 p-8 text-center">
-            <p className="text-ink-700 dark:text-ink-200">{error}</p>
-            <button type="button" onClick={() => window.location.reload()} className="btn-outline mt-5">
-              <RefreshCw className="w-4 h-4" />
-              Try Again
-            </button>
+            <div className="absolute -top-4 -left-4 glass rounded-2xl px-4 py-3 shadow-xl animate-float" style={{ animationDelay: '2s' }}>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
+                <span className="text-xs font-medium text-ink-700 dark:text-ink-200">Based in Saudi Arabia</span>
+              </div>
+            </div>
           </div>
-        )}
 
-        {!isLoading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {videos.map((video, index) => (
-              <VideoCard key={video.id} video={video} index={index} />
-            ))}
+          <div
+            ref={textRef}
+            className={`reveal-right ${textVisible ? 'is-visible' : ''}`}
+          >
+            <span className="inline-block px-4 py-1.5 rounded-full bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 text-xs font-semibold tracking-widest uppercase mb-4">
+              About the Channel
+            </span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-display text-ink-900 dark:text-white text-balance leading-tight">
+              The Story Behind <span className="text-gradient">Raji KRR Travel Vlogs</span>
+            </h2>
+
+            <p className="mt-6 text-base text-ink-600 dark:text-ink-300 leading-relaxed">
+              Raji KRR Travel Vlogs is a family-first travel channel based in Saudi Arabia, sharing honest guides, road trip stories, and hidden gems across the Middle East and beyond.
+            </p>
+            <p className="mt-4 text-base text-ink-600 dark:text-ink-300 leading-relaxed">
+              From local destinations to cross-border adventures, the channel brings together practical guidance, emotional storytelling, and visual inspiration for travelers who want more than just a checklist.
+            </p>
+
+            <div className="mt-8 grid grid-cols-2 gap-4">
+              {[
+                { icon: Calendar, label: 'Launched', value: channelInfo.launchDate },
+                { icon: MapPin, label: 'Based In', value: channelInfo.baseLocation },
+                { icon: Globe, label: 'Language', value: channelInfo.language },
+                { icon: Heart, label: 'Upload Schedule', value: 'Sun & Thu' },
+              ].map((item) => (
+                <div key={item.label} className="flex items-start gap-3 p-3 rounded-xl glass-card">
+                  <div className="w-9 h-9 rounded-lg bg-brand-50 dark:bg-brand-900/30 flex items-center justify-center shrink-0">
+                    <item.icon className="w-4 h-4 text-brand-600 dark:text-brand-400" />
+                  </div>
+                  <div>
+                    <div className="text-xs text-ink-500 dark:text-ink-400">{item.label}</div>
+                    <div className="text-sm font-semibold text-ink-900 dark:text-white">{item.value}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <a
+                href={channelInfo.youtubeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary"
+              >
+                Watch on YouTube
+              </a>
+              <a href="#contact" className="btn-outline">
+                Work With Me
+              </a>
+            </div>
+
+            <div className="mt-8 flex items-center gap-3">
+              <a
+                href={channelInfo.youtubeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-11 h-11 rounded-xl glass-card flex items-center justify-center text-ink-700 dark:text-ink-200 hover:text-brand-600 dark:hover:text-brand-400 hover:scale-110 transition-all duration-300"
+                aria-label="YouTube"
+              >
+                <Youtube className="w-5 h-5" />
+              </a>
+              <a
+                href={channelInfo.instagramUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-11 h-11 rounded-xl glass-card flex items-center justify-center text-ink-700 dark:text-ink-200 hover:text-brand-600 dark:hover:text-brand-400 hover:scale-110 transition-all duration-300"
+                aria-label="Instagram"
+              >
+                <Instagram className="w-5 h-5" />
+              </a>
+              <a
+                href={`mailto:${channelInfo.businessEmail}`}
+                className="w-11 h-11 rounded-xl glass-card flex items-center justify-center text-ink-700 dark:text-ink-200 hover:text-brand-600 dark:hover:text-brand-400 hover:scale-110 transition-all duration-300"
+                aria-label="Business email"
+              >
+                <Mail className="w-5 h-5" />
+              </a>
+            </div>
           </div>
-        )}
-
-        <div className="mt-12 text-center">
-          <a href={channelInfo.youtubeUrl} target="_blank" rel="noopener noreferrer" className="btn-outline group">
-            <ExternalLink className="w-4 h-4" />
-            View All Videos on YouTube
-          </a>
         </div>
       </div>
     </section>
