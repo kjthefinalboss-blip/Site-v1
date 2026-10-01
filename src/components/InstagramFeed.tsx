@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useReveal } from '@/hooks/useScrollAnimations';
 import { channelInfo } from '@/lib/content';
 import { supabase } from '@/lib/supabaseClient';
-import { Instagram, ExternalLink, RefreshCw } from 'lucide-react';
+import { Instagram, ExternalLink, RefreshCw, Calendar } from 'lucide-react';
 
 type InstagramReel = {
   id: string;
@@ -10,8 +10,22 @@ type InstagramReel = {
   caption: string;
   image_url: string;
   post_url: string;
+  likes: string;
   sort_order: number;
+  created_at: string;
 };
+
+type InstagramResponse = {
+  reels?: InstagramReel[];
+};
+
+function formatPostedDate(value: string): string {
+  return new Intl.DateTimeFormat('en', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(new Date(value));
+}
 
 function ReelCard({ reel, index }: { reel: InstagramReel; index: number }) {
   const { ref, isVisible } = useReveal<HTMLAnchorElement>();
@@ -35,6 +49,10 @@ function ReelCard({ reel, index }: { reel: InstagramReel; index: number }) {
       </div>
       <div className="absolute bottom-3 left-3 right-3 rounded-xl bg-ink-950/85 px-3 py-2 text-white text-xs font-semibold backdrop-blur-md">
         <span className="line-clamp-2">{reel.caption}</span>
+        <span className="mt-1 flex items-center gap-1 text-white/65 text-[10px] font-medium">
+          <Calendar className="w-3 h-3" />
+          {formatPostedDate(reel.created_at)}
+        </span>
         <span className="mt-1 inline-flex items-center gap-1 text-brand-300 text-[10px] uppercase tracking-wide">
           <ExternalLink className="w-3 h-3" />
           Open on Instagram
@@ -58,18 +76,33 @@ export default function InstagramFeed() {
         return;
       }
 
-      const { data, error: queryError } = await supabase
-        .from('instagram_posts')
-        .select('id, shortcode, caption, image_url, post_url, sort_order')
-        .order('sort_order', { ascending: true })
-        .limit(6);
+      try {
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/latest-instagram`, {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+            apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+          },
+        });
+        const result = (await response.json()) as InstagramResponse;
+        if (!response.ok || !Array.isArray(result.reels) || result.reels.length === 0) {
+          throw new Error('Unable to refresh Instagram Reels.');
+        }
+        setReels(result.reels);
+      } catch {
+        const { data, error: queryError } = await supabase
+          .from('instagram_posts')
+          .select('id, shortcode, caption, image_url, post_url, likes, sort_order, created_at')
+          .order('sort_order', { ascending: true })
+          .limit(6);
 
-      if (queryError || !data || data.length === 0) {
-        setError('Instagram Reels are unavailable right now.');
-      } else {
-        setReels(data);
+        if (queryError || !data || data.length === 0) {
+          setError('Instagram Reels are unavailable right now.');
+        } else {
+          setReels(data);
+        }
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     void loadReels();

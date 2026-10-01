@@ -1,2 +1,5 @@
 [functions.latest-videos]
 verify_jwt = false
+
+[functions.latest-instagram]
+verify_jwt = false
