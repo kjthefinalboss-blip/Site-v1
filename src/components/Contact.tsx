@@ -104,7 +104,7 @@ export default function FeaturedVideos() {
         }
         setVideos(result.videos.slice(0, 6));
         setError('');
-      } catch (loadError) {
+      } catch {
         setVideos(fallbackVideos);
         setError('');
       } finally {
