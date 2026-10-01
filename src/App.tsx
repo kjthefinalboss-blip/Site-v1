@@ -2,13 +2,12 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import StatsBar from '@/components/StatsBar';
-import FeaturedVideos from '@/components/FeaturedVideos';
+import FeaturedVideos from '@/components/Contact';
 import InstagramFeed from '@/components/InstagramFeed';
 import ContentPillars from '@/components/ContentPillars';
 import Destinations from '@/components/Destinations';
 import RoadTrips from '@/components/RoadTrips';
 import About from '@/components/About';
-import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import { Compass, Mountain, Car, Plane, MapPin, Camera, Globe, Tent, Sun, Waves } from 'lucide-react';
 
@@ -83,7 +82,6 @@ function App() {
           <Destinations />
           <RoadTrips />
           <About />
-          <Contact />
         </main>
         <Footer />
       </div>
