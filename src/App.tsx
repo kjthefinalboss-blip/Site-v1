@@ -8,6 +8,7 @@ import ContentPillars from '@/components/ContentPillars';
 import Destinations from '@/components/Destinations';
 import RoadTrips from '@/components/RoadTrips';
 import About from '@/components/About';
+import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
 import { Compass, Mountain, Car, Plane, MapPin, Camera, Globe, Tent, Sun, Waves } from 'lucide-react';
 
@@ -82,6 +83,7 @@ function App() {
           <Destinations />
           <RoadTrips />
           <About />
+          <ContactSection />
         </main>
         <Footer />
       </div>
