@@ -116,29 +116,38 @@ Also provide:
 
 Respond as JSON with keys: excerpt, content, category, seo_description, seo_keywords`;
 
-  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "llama-3.3-70b-versatile",
-      messages: [{ role: "user", content: prompt }],
-      response_format: { type: "json_object" },
-      max_tokens: 4000,
-      temperature: 0.7,
-    }),
-  });
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-oss-120b",
+        messages: [{ role: "user", content: prompt }],
+        response_format: { type: "json_object" },
+        max_tokens: 4000,
+        temperature: 0.7,
+      }),
+    });
 
-  if (!response.ok) {
+    if (response.ok) {
+      const result = await response.json();
+      const text = result.choices?.[0]?.message?.content ?? "{}";
+      return JSON.parse(text);
+    }
+
+    if (response.status === 429 && attempt < 2) {
+      await new Promise((r) => setTimeout(r, 5000 * (attempt + 1)));
+      continue;
+    }
+
     const errText = await response.text();
     throw new Error(`Groq API error: ${response.status} — ${errText.substring(0, 200)}`);
   }
 
-  const result = await response.json();
-  const text = result.choices?.[0]?.message?.content ?? "{}";
-  return JSON.parse(text);
+  throw new Error("Groq API retries exhausted");
 }
 
 Deno.serve(async (req: Request) => {
@@ -169,6 +178,7 @@ Deno.serve(async (req: Request) => {
 
       try {
         const ai = await generateBlogWithAI(video);
+        await new Promise((r) => setTimeout(r, 3000));
         const baseSlug = slugify(video.title);
         let slug = baseSlug;
         let slugAttempt = 0;
