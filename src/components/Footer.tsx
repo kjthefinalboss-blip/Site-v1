@@ -54,6 +54,14 @@ export default function Footer() {
                     </a>
                   </li>
                 ))}
+                <li>
+                  <a
+                    href="#admin"
+                    className="text-sm text-ink-500 hover:text-gold-400 transition-colors duration-300"
+                  >
+                    Owner Login
+                  </a>
+                </li>
               </ul>
             </div>
 

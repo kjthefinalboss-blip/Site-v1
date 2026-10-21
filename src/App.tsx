@@ -1,8 +1,9 @@
+import { useEffect, useState } from 'react';
 import { ThemeProvider } from '@/context/ThemeContext';
 import Navbar from '@/components/Navbar';
 import Hero from '@/components/Hero';
 import StatsBar from '@/components/StatsBar';
-import FeaturedVideos from '@/components/Contact';
+import FeaturedVideos from '@/components/FeaturedVideos';
 import InstagramFeed from '@/components/InstagramFeed';
 import ContentPillars from '@/components/ContentPillars';
 import Destinations from '@/components/Destinations';
@@ -10,6 +11,10 @@ import RoadTrips from '@/components/RoadTrips';
 import About from '@/components/About';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
+import BlogList from '@/components/BlogList';
+import BlogPage from '@/components/BlogPage';
+import AdminPanel from '@/components/AdminPanel';
+import BlogPreview from '@/components/BlogPreview';
 import { Compass, Mountain, Car, Plane, MapPin, Camera, Globe, Tent, Sun, Waves } from 'lucide-react';
 
 const marqueeWords = [
@@ -67,23 +72,70 @@ function MarqueeStrip() {
   );
 }
 
+type Route = 'home' | 'blog' | 'blog-article' | 'admin';
+
 function App() {
+  const [route, setRoute] = useState<Route>('home');
+  const [blogSlug, setBlogSlug] = useState('');
+
+  useEffect(() => {
+    const parseHash = () => {
+      const hash = window.location.hash;
+      if (hash.startsWith('#blog/')) {
+        const slug = hash.replace('#blog/', '');
+        setBlogSlug(slug);
+        setRoute('blog-article');
+      } else if (hash === '#blog') {
+        setRoute('blog');
+      } else if (hash === '#admin') {
+        setRoute('admin');
+      } else {
+        setRoute('home');
+      }
+    };
+    parseHash();
+    window.addEventListener('hashchange', parseHash);
+    return () => window.removeEventListener('hashchange', parseHash);
+  }, []);
+
+  const navigateToBlog = (slug: string) => {
+    window.location.hash = `#blog/${slug}`;
+  };
+
+  const navigateToBlogList = () => {
+    window.location.hash = '#blog';
+  };
+
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-ink-50 dark:bg-ink-950 transition-colors duration-500 relative">
         <AuroraBackground />
         <Navbar />
         <main>
-          <Hero />
-          <StatsBar />
-          <MarqueeStrip />
-          <FeaturedVideos />
-          <InstagramFeed />
-          <ContentPillars />
-          <Destinations />
-          <RoadTrips />
-          <About />
-          <ContactSection />
+          {route === 'home' && (
+            <>
+              <Hero />
+              <StatsBar />
+              <MarqueeStrip />
+              <FeaturedVideos />
+              <InstagramFeed />
+              <ContentPillars />
+              <Destinations />
+              <RoadTrips />
+              <About />
+              <BlogPreview />
+              <ContactSection />
+            </>
+          )}
+          {route === 'blog' && (
+            <BlogList onNavigate={navigateToBlog} />
+          )}
+          {route === 'blog-article' && (
+            <BlogPage slug={blogSlug} onBack={navigateToBlogList} />
+          )}
+          {route === 'admin' && (
+            <AdminPanel />
+          )}
         </main>
         <Footer />
       </div>
