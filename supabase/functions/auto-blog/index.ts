@@ -83,7 +83,7 @@ async function getLatestVideos() {
 async function generateBlogWithAI(video: { id: string; title: string; description: string }): Promise<{
   excerpt: string; content: string; category: string; seo_description: string; seo_keywords: string;
 }> {
-  const apiKey = Deno.env.get("OPENAI_API_KEY");
+  const apiKey = Deno.env.get("GROQ_API_KEY");
   if (!apiKey) {
     const fallbackContent = `## Overview\n\nThis video from Raji KRR Travel Vlogs covers ${video.title}.\n\nThe full adventure is captured in the video above, where you'll find detailed commentary, route information, and family travel tips.\n\n## Key Highlights\n\n- Full travel documentation with practical advice\n- Family-friendly travel perspective\n- Real experiences and honest recommendations\n\n## Tips for Travelers\n\n- Plan ahead and check border requirements if crossing internationally\n- Keep documents organized and accessible\n- Travel with flexibility — plans can change on the road\n\n## Watch the Full Video\n\nFor the complete experience including visuals, commentary, and step-by-step guidance, watch the full video on YouTube.\n\n*This article was automatically generated from the video and is awaiting review before publishing.*`;
     return {
@@ -116,24 +116,24 @@ Also provide:
 
 Respond as JSON with keys: excerpt, content, category, seo_description, seo_keywords`;
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "gpt-4o-mini",
+      model: "llama-3.3-70b-versatile",
       messages: [{ role: "user", content: prompt }],
       response_format: { type: "json_object" },
-      max_tokens: 2000,
+      max_tokens: 4000,
       temperature: 0.7,
     }),
   });
 
   if (!response.ok) {
     const errText = await response.text();
-    throw new Error(`OpenAI API error: ${response.status} — ${errText.substring(0, 200)}`);
+    throw new Error(`Groq API error: ${response.status} — ${errText.substring(0, 200)}`);
   }
 
   const result = await response.json();

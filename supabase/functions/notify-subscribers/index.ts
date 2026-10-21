@@ -47,7 +47,8 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    const siteUrl = Deno.env.get("SITE_URL") ?? "https://bolt.new";
+    const url = new URL(req.url);
+    const siteUrl = Deno.env.get("SITE_URL") ?? `${url.protocol}//${url.host}`;
 
     let subject = "New travel content from Raji KRR Travel Vlogs";
     let htmlBody = "";
